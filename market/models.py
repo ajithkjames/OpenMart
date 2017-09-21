@@ -5,13 +5,21 @@ from django.db import models
 from account.models import User
 
 
+class ModelManager(models.Manager):
+    def get_queryset(self, fetch_all=False):
+        return super(ModelManager, self).get_queryset() if fetch_all \
+            else super(ModelManager, self).get_queryset().all()
+
+
 class DateMixin(models.Model):
 
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_now=True)
+    objects = ModelManager()
 
-        class Meta:
-                abstract = True
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+            abstract = True
 
 
 class Category(DateMixin):
@@ -31,8 +39,8 @@ class Advertisement(DateMixin):
     description = models.TextField(blank=True, null=True)
     price = models.CharField(max_length=255, blank=True, null=True)
     category = models.ForeignKey(Category, null=True, blank=True)
-    views = models.PositiveIntegerField(null=True, blank=True)
-    image = models.ImageField(upload_to='documents/')
+    views = models.PositiveIntegerField(null=True, blank=True, default=0)
+    image = models.ImageField(upload_to='documents/', null=True, blank=True)
 
     def __str__(self):
 		return u'%s - %s' % (self.title, self.author)

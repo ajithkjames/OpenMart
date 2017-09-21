@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.shortcuts import get_object_or_404
+from django.db.models import F
+from rest_framework import filters
+from rest_framework.response import Response
 from rest_framework import viewsets
 from account.models import User
 from market.models import Category, Advertisement
@@ -22,8 +26,18 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
 	serializer_class = AdvertisementSerializer
 	queryset = Advertisement.objects.all()
 	permission_classes = (AdvertisementPermission,)
+	filter_backends = (filters.SearchFilter,)
+	search_fields = ('title','category__name','description')
 
 	def get_serializer_class(self):
 		if self.request.method != 'GET': 
 			self.serializer_class = AdvertisementCreateSerializer 
 		return self.serializer_class
+
+	def retrieve(self, request, pk=None):
+		queryset = Advertisement.objects.all()
+		advertisement = get_object_or_404(queryset, pk=pk)
+		Advertisement.objects.filter(pk=pk).update(views=F('views') + 1)
+		advertisement.views += 1 
+		serializer = AdvertisementSerializer(advertisement)
+		return Response(serializer.data)

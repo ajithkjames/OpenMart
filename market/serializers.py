@@ -13,19 +13,30 @@ class BaseUserSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name',)
+        fields = ('id','name','created_at','updated_at')
 
 
 class AdvertisementSerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer(read_only=True)
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name',
+     )
+    id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Advertisement
-        fields = ('author','title','description','price','category','views','image')
+        fields = ('id','author','title','description','price','category','views','image','created_at','updated_at')
 
 
 class AdvertisementCreateSerializer(serializers.ModelSerializer):
 
+    author = serializers.HiddenField(
+    default=serializers.CurrentUserDefault()
+    )
+    id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Advertisement
-        fields = ('author','title','description','price','category','views','image')
+        fields = ('id','author','title','description','price','category','image')
