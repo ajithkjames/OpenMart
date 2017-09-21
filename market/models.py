@@ -5,15 +5,7 @@ from django.db import models
 from account.models import User
 
 
-class ModelManager(models.Manager):
-    def get_queryset(self, fetch_all=False):
-        return super(ModelManager, self).get_queryset() if fetch_all \
-            else super(ModelManager, self).get_queryset().all()
-
-
 class DateMixin(models.Model):
-
-    objects = ModelManager()
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
