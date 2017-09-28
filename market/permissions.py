@@ -25,6 +25,14 @@ class CategoryPermission(permissions.BasePermission):
 
 class AdvertisementPermission(permissions.IsAuthenticated):
 
+    def has_permission(self, request, view):
+        
+        if request.user.is_authenticated:
+            return True
+        else:
+            if request.method in ('HEAD', 'OPTIONS', 'GET'):
+                return True
+            return False
 
     def has_object_permission(self, request, view, obj):
         if obj.author== request.user or request.user.is_superuser:

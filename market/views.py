@@ -5,6 +5,7 @@ from django.db.models import F
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.parsers import FormParser, MultiPartParser
 from account.models import User
 from market.models import Category, Advertisement
 from market.serializers import CategorySerializer, AdvertisementSerializer, AdvertisementCreateSerializer
@@ -24,7 +25,8 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
 	"""Advertisement API view"""
 
 	serializer_class = AdvertisementSerializer
-	queryset = Advertisement.objects.all()
+	queryset = Advertisement.objects.all().order_by('-created_at')
+	parser_classes = (MultiPartParser, FormParser,)
 	permission_classes = (AdvertisementPermission,)
 	filter_backends = (filters.SearchFilter,)
 	search_fields = ('title','category__name','description')
@@ -40,4 +42,8 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
 		Advertisement.objects.filter(pk=pk).update(views=F('views') + 1)
 		advertisement.views += 1 
 		serializer = AdvertisementSerializer(advertisement)
+		return Response(serializer.data)
+
+	def perform_create(self, serializer):
+		serializer.save(image=self.request.data.get('image'), author=self.request.user)
 		return Response(serializer.data)

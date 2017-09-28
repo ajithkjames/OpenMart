@@ -23,7 +23,6 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name',
      )
-    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Advertisement

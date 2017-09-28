@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','password','first_name','phone')
+        fields = ('id','username','password','first_name','phone')
         extra_kwargs = {
             'password': {'write_only': True, 'required':False}
         }
@@ -19,5 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
         if validated_data.get('password'):
             instance.set_password(validated_data.get('password'))
         instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.phone = validated_data.get('phone', instance.phone)
         instance.save()
         return instance
